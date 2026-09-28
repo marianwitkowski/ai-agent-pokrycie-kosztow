@@ -429,6 +429,8 @@ def main(sciezka_config):
 
 
 if __name__ == '__main__':
+    for strumien in (sys.stdout, sys.stderr):  # Windows: wyjście przez potok ma kodowanie cp125x -> błąd na '≠', 'ą'
+        strumien.reconfigure(encoding='utf-8')
     if len(sys.argv) != 2:
         sys.exit(__doc__)
     main(sys.argv[1])

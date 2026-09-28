@@ -6,52 +6,128 @@ Agent porównuje dokumenty kosztowe z wyciągiem z konta firmowego i w kilka min
 ile kosztów **nie ma pokrycia** w wydatkach z konta (z przeliczeniem walut po kursie NBP), których wydatków z konta
 **brakuje w dokumentach** i gdzie w danych są **błędy** — zanim trafią do księgowości.
 
-`Python 3.9+` · `bez zależności` · `dane zostają na Twoim komputerze` · `CSV i MT940` · `po polsku` · `licencja MIT`
+`macOS · Windows · Linux` · `bez programowania` · `obliczenia na Twoim komputerze` · `wyciągi CSV i MT940` · `licencja MIT`
 
 ---
 
 ## Po co to jest
 
 W małej firmie część kosztów płaci się firmową kartą, część przelewem, a część — prywatną kartą, gotówką albo
-z innego rachunku. System księgowy zwykle pokazuje, że dokument jest „zapłacony”, ale nie mówi **skąd**.
+z innego rachunku. Program księgowy zwykle pokazuje, że dokument jest „zapłacony”, ale nie mówi **skąd**.
 Ręczne zestawianie kilkuset paragonów z wyciągiem zajmuje godziny i łatwo o pomyłkę.
 
-Ten agent robi to za Ciebie i daje:
+Agent robi to za Ciebie i daje:
 
 - **kwotę bez pokrycia** — sumę dokumentów, za które nie ma płatności z konta firmowego (np. do rozliczenia
   z właścicielem),
 - **listę do sprawdzenia** — dopasowania prawdopodobne, ale niepewne (odległe daty, płatność w PLN za fakturę w USD),
 - **wydatki bez dokumentu** — płatności z konta, do których brakuje faktury lub paragonu,
-- **problemy z danymi** — błędy odczytu kwot (netto + VAT ≠ brutto), duplikaty, brak kwot, błędne terminy,
+- **problemy z danymi** — błędnie odczytane kwoty (netto + VAT ≠ brutto), duplikaty, brak kwot, błędne terminy,
 - **podsumowanie gotówki** — wypłaty z bankomatów obok dokumentów opłaconych gotówką.
 
-## Jak pracuje agent
+## Jak zacząć — krok po kroku
 
-1. **Pyta o kontekst** — gdzie są pliki, który rachunek jest firmowy, jaki okres.
-2. **Analizuje pliki** — sam rozpoznaje format wyciągu (CSV dowolnego banku albo MT940) i układ kolumn w pliku
-   z dokumentami; przygotowuje mapę kolumn i sprawdza konwersję (liczba wierszy, sumy, zakres dat).
-3. **Ustala z Tobą reguły** — które operacje pominąć (podatki, ZUS, rachunek VAT, przelewy własne), co jest opłatą
-   bankową, a co wypłatą gotówki. Pokazuje tabelę i czeka na potwierdzenie.
-4. **Dopasowuje** dokumenty do transakcji i przygotowuje raporty.
-5. **Weryfikuje wynik** — przegląda pozycje niepewne i problemy z danymi, proponuje korekty (np. poprawienie błędnie
-   odczytanej kwoty), liczy ponownie.
-6. **Raportuje** — kwota bez pokrycia, najważniejsze pozycje, co poprawić w systemie źródłowym.
+Nie musisz umieć programować. Ty dostarczasz dwa pliki i odpowiadasz na pytania — resztę robi agent.
 
-Instrukcja agenta jest w [`PROMPT.md`](PROMPT.md); obliczenia wykonują deterministyczne skrypty w Pythonie,
-więc wynik jest powtarzalny i sprawdzalny.
+**Potrzebujesz:**
 
-```mermaid
-flowchart LR
-    D["Dokumenty kosztowe<br/>CSV / TSV"] --> K["konwertuj.py<br/>mapa kolumn / MT940"]
-    W["Wyciąg bankowy<br/>CSV / MT940"] --> K
-    K --> F["format kanoniczny"]
-    F --> P["pokrycie.py"]
-    C["config.json<br/>korekty.csv"] --> P
-    N[("kursy NBP")] --> P
-    P --> R["podsumowanie.md<br/>raporty CSV"]
-    A(("agent AI<br/>PROMPT.md")) -. prowadzi .-> K
-    A -. weryfikuje .-> R
-```
+- komputera z **macOS 13+**, **Windows 10/11** albo **Linuksem** (Ubuntu/Debian),
+- **płatnego konta Claude** (Pro, Max, Team lub Enterprise) — darmowy plan nie obejmuje Claude Code,
+- **wyciągu z konta firmowego** (CSV albo MT940) i **listy faktur i paragonów** (CSV),
+- Pythona **nie musisz instalować sam** — agent sprawdzi, czy jest, i w razie potrzeby zainstaluje go za Twoją zgodą.
+
+### Krok 1. Zainstaluj aplikację Claude
+
+| System | Co zrobić |
+|---|---|
+| **macOS** | Pobierz [Claude dla macOS](https://claude.ai/api/desktop/darwin/universal/dmg/latest/redirect), otwórz pobrany plik i przeciągnij Claude do folderu *Aplikacje*. |
+| **Windows** | Pobierz [Claude dla Windows](https://claude.ai/api/desktop/win32/x64/setup/latest/redirect) i uruchom instalator (komputery z procesorem ARM: [wersja ARM64](https://claude.ai/api/desktop/win32/arm64/setup/latest/redirect)). |
+| **Linux** | Zainstaluj według instrukcji [Claude Desktop na Linuksie](https://code.claude.com/docs/en/desktop-linux) (wersja beta, Ubuntu/Debian). |
+
+Uruchom aplikację, zaloguj się i kliknij zakładkę **Code** na górze okna.
+
+<details>
+<summary>Wolisz terminal? Zainstaluj Claude Code w wersji tekstowej</summary>
+
+| System | Polecenie |
+|---|---|
+| macOS, Linux | `curl -fsSL https://claude.ai/install.sh \| bash` |
+| Windows (PowerShell) | `irm https://claude.ai/install.ps1 \| iex` |
+
+Potem otwórz nowe okno terminala i sprawdź: `claude --version`.
+Szczegóły i inne metody: [instalacja Claude Code](https://code.claude.com/docs/en/setup).
+
+</details>
+
+### Krok 2. Pobierz agenta
+
+1. Otwórz stronę **https://github.com/marianwitkowski/ai-agent-pokrycie-kosztow**.
+2. Kliknij zielony przycisk **Code** → **Download ZIP**.
+3. Rozpakuj plik:
+   - **macOS** — kliknij dwukrotnie pobrany plik ZIP,
+   - **Windows** — kliknij prawym przyciskiem → **Wyodrębnij wszystkie…** → **Wyodrębnij**,
+   - **Linux** — prawy przycisk → **Rozpakuj tutaj**.
+4. Przenieś rozpakowany folder `ai-agent-pokrycie-kosztow` w wygodne miejsce, np. do *Dokumentów*.
+
+(Znasz Git? `git clone https://github.com/marianwitkowski/ai-agent-pokrycie-kosztow.git`)
+
+### Krok 3. Włóż swoje pliki do folderu `dane`
+
+W folderze agenta jest folder **`dane`**. Skopiuj do niego:
+
+- **wyciąg z konta firmowego** — w bankowości internetowej zwykle *Historia* / *Operacje* → *Eksport* / *Pobierz* →
+  format **CSV** albo **MT940**; weź okres o 1–2 miesiące dłuższy niż okres dokumentów (faktury płaci się
+  z opóźnieniem),
+- **listę faktur i paragonów kosztowych** — plik CSV z programu księgowego lub od biura rachunkowego;
+  plik z Excela zapisz jako CSV: *Plik → Zapisz jako → CSV UTF-8*.
+
+Nazwy plików mogą być dowolne.
+
+### Krok 4. Uruchom agenta
+
+1. W aplikacji Claude, w zakładce **Code**, wybierz **Local** i kliknij **Select folder** — wskaż folder
+   `ai-agent-pokrycie-kosztow`.
+2. Wpisz i wyślij:
+
+   ```text
+   Przeczytaj PROMPT.md i przeprowadź mnie przez sprawdzenie pokrycia kosztów. Moje pliki są w folderze dane.
+   ```
+
+3. Agent poprosi o zgodę przed uruchamianiem poleceń — przeczytaj jednozdaniowe wyjaśnienie i zatwierdź.
+   Najbezpieczniej pracować w trybie uprawnień **Manual** (przełącznik obok przycisku wysyłania).
+
+<details>
+<summary>Uruchomienie w terminalu (Claude Code w wersji tekstowej)</summary>
+
+| System | Jak otworzyć terminal w folderze agenta | Start |
+|---|---|---|
+| macOS | *Terminal* (Cmd+Spacja → „Terminal”), wpisz `cd ` (ze spacją), przeciągnij folder agenta do okna, Enter | `claude` |
+| Windows | Otwórz folder agenta w Eksploratorze, kliknij pasek adresu, wpisz `powershell`, Enter | `claude` |
+| Linux | Prawy przycisk w folderze agenta → **Otwórz w terminalu** | `claude` |
+
+Następnie wyślij tę samą wiadomość co wyżej.
+
+</details>
+
+### Krok 5. Rozmowa i wynik
+
+Agent:
+
+1. sprawdzi, czy jest Python, i w razie potrzeby **zainstaluje go** (poprosi o zgodę; system może zapytać o hasło
+   albo pokazać okno „Czy zezwolić…?” — to normalne),
+2. obejrzy Twoje pliki i zapyta o rzeczy, których nie da się z nich wyczytać — np. który rachunek jest firmowy,
+3. pokaże, które rodzaje operacji zamierza pominąć (podatki, ZUS, przelewy własne), i poczeka na Twoje potwierdzenie,
+4. policzy wynik, przejrzy pozycje niepewne i błędy w danych, zaproponuje poprawki,
+5. poda **kwotę bez pokrycia** i najważniejsze wnioski.
+
+Pliki z wynikami znajdziesz w **`dane/wyniki/`**:
+
+| plik | otwórz w | zawartość |
+|---|---|---|
+| `podsumowanie.md` | dowolnym edytorze tekstu (albo poproś agenta o omówienie) | wszystkie sumy, pozycje do sprawdzenia, problemy z danymi |
+| `raport_niepokryte.csv` | Excel / LibreOffice / Numbers | dokumenty bez pokrycia z kwotą w PLN i kursem NBP |
+| `raport_koszty.csv` | Excel / LibreOffice / Numbers | wszystkie dokumenty i dopasowane płatności |
+| `raport_wydatki_bez_dokumentu.csv` | Excel / LibreOffice / Numbers | płatności z konta, do których brakuje dokumentu |
 
 ## Przykładowy wynik
 
@@ -85,66 +161,104 @@ Fragment `podsumowanie.md` dla fikcyjnych danych z katalogu [`example/`](example
 > | PAR/0001 | duplikat numeru |
 > | FV/9/2026 | termin ponad 30 dni przed datą dokumentu |
 
-Obok podsumowania powstają raporty CSV (otwierają się w polskim Excelu): wszystkie dokumenty z dopasowaną
-transakcją, dokumenty bez pokrycia z kwotą w PLN i kursem NBP (tabela, data kursu) oraz wydatki bez dokumentu.
+## Najczęstsze pytania
 
-## Szybki start
+<details>
+<summary><b>Ile to kosztuje?</b></summary>
 
-### Z agentem (zalecane)
+Samo narzędzie jest bezpłatne (licencja MIT). Do pracy z agentem potrzebny jest płatny plan Claude
+(Pro, Max, Team lub Enterprise) — [cennik](https://claude.com/pricing). Bez agenta, samymi skryptami, można korzystać
+za darmo (sekcja „Dla zaawansowanych”).
 
-Potrzebujesz agenta z dostępem do terminala, np. [Claude Code](https://claude.com/claude-code).
+</details>
 
-```bash
-git clone https://github.com/marianwitkowski/ai-agent-pokrycie-kosztow.git
-cd ai-agent-pokrycie-kosztow
-mkdir -p ~/pokrycie/2026-q1          # katalog roboczy na Twoje dane — poza repozytorium
-claude --add-dir ~/pokrycie/2026-q1
+<details>
+<summary><b>Czy moje dane trafiają do internetu?</b></summary>
+
+- **Obliczenia** wykonują skrypty na Twoim komputerze. Jedyne połączenie, jakie nawiązują, to pobranie kursów walut
+  z Narodowego Banku Polskiego (wysyłane są tylko kody walut i daty).
+- **Agent AI** działa w chmurze (Anthropic). To, co agent przeczyta, żeby wykonać zadanie — nagłówki plików,
+  kilka przykładowych wierszy, podsumowania, pojedyncze pozycje do wyjaśnienia — trafia do rozmowy z modelem
+  na zasadach Twojego konta Claude. Agent ma polecenie czytać tylko to, co potrzebne, i nie wczytywać całych plików.
+- Jeśli dane nie mogą opuścić komputera, użyj samych skryptów, bez agenta.
+- Twoje pliki w folderze `dane/` nie trafiają do repozytorium Git. Jeśli przekazujesz komuś folder agenta,
+  najpierw usuń z niego swoje dane.
+
+</details>
+
+<details>
+<summary><b>Czy agent coś zmieni w banku albo w programie księgowym?</b></summary>
+
+Nie. Agent tylko czyta pliki, które mu dasz, i zapisuje raporty w `dane/wyniki/`. Nie łączy się z bankiem ani
+z programem księgowym, nie zmienia Twoich plików źródłowych (poprawki zapisuje osobno, w `dane/korekty.csv`,
+z podaniem powodu) i nie udziela porad podatkowych.
+
+</details>
+
+<details>
+<summary><b>Mój bank daje tylko PDF.</b></summary>
+
+PDF nie wystarczy. W bankowości internetowej (zwłaszcza firmowej) poszukaj eksportu historii rachunku do **CSV**
+albo **MT940** — zwykle w *Historii* / *Operacjach*, opcja *Eksport*, *Pobierz* albo *Zestawienie*.
+
+</details>
+
+<details>
+<summary><b>Mam dokumenty w Excelu.</b></summary>
+
+Otwórz plik w Excelu i wybierz *Plik → Zapisz jako → CSV UTF-8 (rozdzielany przecinkami)*. Układ kolumn może być
+dowolny — agent sam go rozpozna.
+
+</details>
+
+<details>
+<summary><b>Agent prosi o hasło albo zgodę administratora.</b></summary>
+
+Tak jest przy instalacji Pythona — to darmowy program potrzebny do obliczeń. Na Windows pojawi się okno
+„Czy zezwolić…?” (kliknij **Tak**), na macOS okno instalacji narzędzi systemowych (kliknij **Zainstaluj**),
+na Linuksie agent poprosi, żebyś sam wpisał polecenie z hasłem. Agent nigdy nie powinien prosić o hasło w rozmowie —
+hasło wpisujesz tylko w okienku systemu.
+
+</details>
+
+<details>
+<summary><b>Na Windows wpisanie „python” otwiera Microsoft Store.</b></summary>
+
+To znaczy, że Pythona jeszcze nie ma. Agent zainstaluje go poleceniem `winget` albo poprosi o instalator
+z [python.org](https://www.python.org/downloads/) (zaznacz wtedy **„Add python.exe to PATH”**). Po instalacji może
+być potrzebne ponowne uruchomienie aplikacji Claude.
+
+</details>
+
+## Jak pracuje agent
+
+1. **Sprawdza środowisko** — czy jest Python (w razie potrzeby instaluje za zgodą).
+2. **Pyta o kontekst** — gdzie są pliki, który rachunek jest firmowy, jaki okres.
+3. **Analizuje pliki** — rozpoznaje format wyciągu (CSV dowolnego banku albo MT940) i układ kolumn w pliku
+   z dokumentami; przygotowuje mapę kolumn i sprawdza konwersję (liczba wierszy, sumy, zakres dat).
+4. **Ustala z Tobą reguły** — które operacje pominąć (podatki, ZUS, rachunek VAT, przelewy własne), co jest opłatą
+   bankową, a co wypłatą gotówki.
+5. **Dopasowuje** dokumenty do płatności i przygotowuje raporty.
+6. **Weryfikuje** — przegląda pozycje niepewne i problemy z danymi, proponuje korekty, liczy ponownie.
+7. **Raportuje** — kwota bez pokrycia, najważniejsze pozycje, co poprawić w systemie źródłowym.
+
+Instrukcja agenta jest w [`PROMPT.md`](PROMPT.md); obliczenia wykonują skrypty w Pythonie, więc wynik jest
+powtarzalny i sprawdzalny.
+
+```mermaid
+flowchart LR
+    D["Dokumenty kosztowe<br/>CSV / TSV"] --> K["konwertuj.py<br/>mapa kolumn / MT940"]
+    W["Wyciąg bankowy<br/>CSV / MT940"] --> K
+    K --> F["format kanoniczny"]
+    F --> P["pokrycie.py"]
+    C["config.json<br/>korekty.csv"] --> P
+    N[("kursy NBP")] --> P
+    P --> R["podsumowanie.md<br/>raporty CSV"]
+    A(("agent AI<br/>PROMPT.md")) -. prowadzi .-> K
+    A -. weryfikuje .-> R
 ```
 
-Pierwsza wiadomość do agenta:
-
-```text
-Przeczytaj PROMPT.md i przeprowadź mnie przez sprawdzenie pokrycia kosztów.
-Dokumenty: ~/pokrycie/2026-q1/koszty.csv, wyciąg: ~/pokrycie/2026-q1/wyciag.csv, katalog roboczy: ~/pokrycie/2026-q1
-```
-
-Inny agent: wklej treść [`PROMPT.md`](PROMPT.md) jako pierwszą wiadomość i podaj ścieżki do plików.
-
-### Bez agenta
-
-```bash
-T=/ścieżka/do/ai-agent-pokrycie-kosztow                                # repozytorium z narzędziami
-cd ~/pokrycie/2026-q1                                                  # katalog roboczy z danymi
-cp $T/config.example.json config.json                                  # uzupełnij rachunek firmowy i reguły
-python3 $T/konwertuj.py podglad wyciag.csv                             # kolumny, kodowanie, separator
-python3 $T/konwertuj.py csv wyciag.csv --mapa mapa_wyciag.json -o transakcje.csv   # albo: mt940 wyciag.sta
-python3 $T/konwertuj.py csv koszty.csv --mapa mapa_dokumenty.json -o dokumenty.csv
-python3 $T/pokrycie.py config.json                                      # wyniki w wyniki/
-```
-
-Wzory map: [`example/mapa_wyciag.json`](example/mapa_wyciag.json), [`example/mapa_dokumenty.json`](example/mapa_dokumenty.json),
-[`mapy/credit_agricole_csv.json`](mapy/credit_agricole_csv.json).
-
-### Wypróbuj na danych przykładowych
-
-```bash
-cd example
-python3 ../konwertuj.py csv dokumenty_zrodlo.csv --mapa mapa_dokumenty.json -o dokumenty.csv
-python3 ../konwertuj.py mt940 wyciag.sta -o transakcje.csv
-python3 ../pokrycie.py config.json
-cat wyniki/podsumowanie.md
-```
-
-## Czego potrzebujesz
-
-| | |
-|---|---|
-| **Dokumenty kosztowe** | plik CSV/TSV z fakturami i paragonami — dowolny układ kolumn (agent przygotuje mapę); minimum: numer, data, kwota brutto; im więcej (waluta, forma płatności, NIP, rachunek sprzedawcy, netto, VAT), tym lepsze dopasowanie i kontrole |
-| **Wyciąg bankowy** | eksport historii rachunku firmowego do CSV albo MT940; najlepiej o 1–2 miesiące dłuższy niż okres dokumentów (faktury płaci się z opóźnieniem) |
-| **Python 3.9+** | tylko biblioteka standardowa |
-| **Internet** | tylko przy dokumentach w walutach obcych — kursy z `api.nbp.pl` |
-
-## Jak działa dopasowanie
+### Jak działa dopasowanie
 
 Każda płatność z konta pokrywa najwyżej jeden dokument. Pary wybierane są od najpewniejszych:
 
@@ -170,22 +284,68 @@ nie dopasowuje się do dokumentów.
 Kurs walut: średni kurs NBP (tabela A) z ostatniego dnia roboczego przed datą dokumentu — tak jak przy kosztach
 w CIT; można przełączyć na kurs z dnia dokumentu.
 
-## Prywatność
+### Ograniczenia
 
-- Wszystkie obliczenia odbywają się lokalnie. Jedyne połączenie sieciowe to pobranie kursów walut z NBP
-  (wysyłane są tylko kody walut i daty).
-- Dane firmy trzymaj w katalogu roboczym **poza repozytorium**. `.gitignore` blokuje typowe nazwy plików z danymi,
-  ale to tylko zabezpieczenie przed pomyłką.
-- Agent nie modyfikuje plików źródłowych — poprawki danych zapisuje w `korekty.csv` z podaniem powodu.
-- Dane w [`example/`](example/) są w całości fikcyjne.
-
-## Ograniczenia
-
-- Nie księguje, nie zmienia niczego w systemie księgowym ani w banku i nie jest poradą podatkową.
-- Nie łączy się z bankiem — wyciąg trzeba pobrać samodzielnie.
+- Nie księguje, nie zmienia niczego w programie księgowym ani w banku i nie jest poradą podatkową.
+- Nie łączy się z bankiem — wyciąg trzeba pobrać samodzielnie (CSV albo MT940; PDF nie wystarczy).
 - Płatności u jednego sprzedawcy z różnych dni nie są sumowane (np. faktura zbiorcza za cały miesiąc).
 - Gotówka nie jest przypisywana do konkretnych dokumentów — agent pokazuje porównanie sum.
 - Rachunek w walucie obcej: dopasowywane są tylko dokumenty w tej samej walucie.
+
+## Dla zaawansowanych
+
+<details>
+<summary><b>Python — instalacja ręczna</b></summary>
+
+Wymagany Python 3.9 lub nowszy, bez dodatkowych bibliotek.
+
+| System | Sprawdzenie | Instalacja | Polecenie w dalszych krokach |
+|---|---|---|---|
+| Windows | `py -3 --version` | `winget install -e --id Python.Python.3.12` albo instalator z [python.org](https://www.python.org/downloads/) (zaznacz **Add python.exe to PATH**) | `py` |
+| macOS | `python3 --version` | `xcode-select --install`, `brew install python` albo instalator z [python.org](https://www.python.org/downloads/macos/) | `python3` |
+| Linux | `python3 --version` | Debian/Ubuntu: `sudo apt install python3`, Fedora: `sudo dnf install python3` | `python3` |
+
+</details>
+
+<details>
+<summary><b>Praca bez agenta (same skrypty)</b></summary>
+
+Skopiuj pliki do `dane/`, przygotuj mapy kolumn (wzory: [`example/mapa_wyciag.json`](example/mapa_wyciag.json),
+[`example/mapa_dokumenty.json`](example/mapa_dokumenty.json), [`mapy/credit_agricole_csv.json`](mapy/credit_agricole_csv.json))
+i uzupełnij `config.json` (rachunek firmowy, reguły).
+
+**macOS / Linux** (Terminal, w folderze agenta):
+
+```bash
+cd dane
+cp ../config.example.json config.json                                   # uzupełnij rachunek firmowy i reguły
+python3 ../konwertuj.py podglad wyciag.csv                              # kolumny, kodowanie, separator
+python3 ../konwertuj.py csv wyciag.csv --mapa mapa_wyciag.json -o transakcje.csv   # albo: mt940 wyciag.sta -o transakcje.csv
+python3 ../konwertuj.py csv koszty.csv --mapa mapa_dokumenty.json -o dokumenty.csv
+python3 ../pokrycie.py config.json                                      # wyniki w dane/wyniki/
+```
+
+**Windows** (PowerShell, w folderze agenta):
+
+```powershell
+cd dane
+Copy-Item ..\config.example.json config.json                            # uzupełnij rachunek firmowy i reguły
+py ..\konwertuj.py podglad wyciag.csv
+py ..\konwertuj.py csv wyciag.csv --mapa mapa_wyciag.json -o transakcje.csv      # albo: mt940 wyciag.sta -o transakcje.csv
+py ..\konwertuj.py csv koszty.csv --mapa mapa_dokumenty.json -o dokumenty.csv
+py ..\pokrycie.py config.json
+```
+
+**Dane przykładowe** — w folderze `example/` (na Windows `py` zamiast `python3` i `\` zamiast `/`):
+
+```bash
+cd example
+python3 ../konwertuj.py csv dokumenty_zrodlo.csv --mapa mapa_dokumenty.json -o dokumenty.csv
+python3 ../konwertuj.py mt940 wyciag.sta -o transakcje.csv
+python3 ../pokrycie.py config.json
+```
+
+</details>
 
 <details>
 <summary><b>Format kanoniczny plików</b></summary>
@@ -291,34 +451,19 @@ w kolejności `pomin` → `bez_dopasowania` → `gotowka`.
 
 </details>
 
-<details>
-<summary><b>Raporty (<code>wyniki/</code>)</b></summary>
-
-| plik | zawartość |
-|---|---|
-| `podsumowanie.md` | sumy wg statusów, kwota bez pokrycia, gotówka, pozycje do sprawdzenia, problemy z danymi, dokumenty na granicy wyciągu, wydatki bez dokumentu, przyjęte reguły |
-| `raport_koszty.csv` | wszystkie dokumenty: status, dopasowana transakcja, sposób dopasowania, uwagi, korekta |
-| `raport_niepokryte.csv` | dokumenty bez pokrycia i do sprawdzenia: kwota w PLN, kwota i waluta oryginalna, kurs, tabela i data kursu NBP |
-| `raport_wydatki_bez_dokumentu.csv` | wydatki z konta bez dokumentu (typ: wydatek / gotówka / opłata) |
-
-Separator `;`, UTF-8 z BOM — pliki otwierają się poprawnie w polskim Excelu.
-
-</details>
-
 ## Zawartość repozytorium
 
 | plik | |
 |---|---|
-| [`PROMPT.md`](PROMPT.md) | instrukcja dla agenta AI: procedura, weryfikacja, typowe pułapki, zasady ochrony danych |
-| [`pokrycie.py`](pokrycie.py) | dopasowanie dokumentów do transakcji, kontrole danych, raporty |
+| [`PROMPT.md`](PROMPT.md) | instrukcja dla agenta AI: środowisko, procedura, weryfikacja, typowe pułapki, zasady ochrony danych |
+| [`dane/`](dane/) | tu wkładasz swoje pliki; tu powstają wyniki (poza repozytorium Git) |
+| [`pokrycie.py`](pokrycie.py) | dopasowanie dokumentów do płatności, kontrole danych, raporty |
 | [`konwertuj.py`](konwertuj.py) | podgląd plików, konwersja CSV (wg mapy) i MT940 do formatu kanonicznego |
 | [`config.example.json`](config.example.json) | wzór konfiguracji |
-| [`mapy/`](mapy/) | gotowe mapy kolumn wyciągów bankowych |
+| [`mapy/`](mapy/) | gotowe mapy kolumn wyciągów bankowych — nowy bank to nowy plik JSON, bez zmian w kodzie |
 | [`example/`](example/) | fikcyjne dane: dokumenty, ten sam wyciąg w CSV i MT940, mapy, korekty, config |
-| [`test_pokrycie.py`](test_pokrycie.py) | testy (bez sieci) — `python3 test_pokrycie.py` |
+| [`test_pokrycie.py`](test_pokrycie.py) | testy (bez sieci) — `python3 test_pokrycie.py` (Windows: `py test_pokrycie.py`) |
 | [`LICENSE`](LICENSE) | licencja MIT |
-
-Nowa mapa dla innego banku to plik JSON w `mapy/` — bez zmian w kodzie.
 
 ## Licencja
 

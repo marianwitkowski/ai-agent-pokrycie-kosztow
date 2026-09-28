@@ -1,5 +1,6 @@
-# Prawdziwe dane i wyniki nie trafiają do repozytorium — pracuj w katalogu roboczym poza tym katalogiem.
-/dane/
+# Dane firmy i wyniki nie trafiają do repozytorium — trzymaj je w dane/ (poza plikiem PRZECZYTAJ.md) albo poza tym folderem.
+/dane/*
+!/dane/PRZECZYTAJ.md
 /wyniki/
 /config.json
 /korekty.csv

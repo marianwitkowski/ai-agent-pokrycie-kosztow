@@ -205,6 +205,8 @@ def konwertuj_mt940(a):
 
 
 if __name__ == '__main__':
+    for strumien in (sys.stdout, sys.stderr):  # Windows: wyjście przez potok ma kodowanie cp125x -> błąd na '≠', 'ą'
+        strumien.reconfigure(encoding='utf-8')
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = p.add_subparsers(dest='cmd', required=True)
     s = sub.add_parser('podglad')
