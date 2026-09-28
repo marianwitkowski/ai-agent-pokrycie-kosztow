@@ -95,8 +95,8 @@ transakcją, dokumenty bez pokrycia z kwotą w PLN i kursem NBP (tabela, data ku
 Potrzebujesz agenta z dostępem do terminala, np. [Claude Code](https://claude.com/claude-code).
 
 ```bash
-git clone <adres-repozytorium> pokrycie-kosztow
-cd pokrycie-kosztow
+git clone https://github.com/marianwitkowski/ai-agent-pokrycie-kosztow.git
+cd ai-agent-pokrycie-kosztow
 mkdir -p ~/pokrycie/2026-q1          # katalog roboczy na Twoje dane — poza repozytorium
 claude --add-dir ~/pokrycie/2026-q1
 ```
@@ -113,7 +113,7 @@ Inny agent: wklej treść [`PROMPT.md`](PROMPT.md) jako pierwszą wiadomość i 
 ### Bez agenta
 
 ```bash
-T=/ścieżka/do/pokrycie-kosztow                                         # repozytorium z narzędziami
+T=/ścieżka/do/ai-agent-pokrycie-kosztow                                # repozytorium z narzędziami
 cd ~/pokrycie/2026-q1                                                  # katalog roboczy z danymi
 cp $T/config.example.json config.json                                  # uzupełnij rachunek firmowy i reguły
 python3 $T/konwertuj.py podglad wyciag.csv                             # kolumny, kodowanie, separator
