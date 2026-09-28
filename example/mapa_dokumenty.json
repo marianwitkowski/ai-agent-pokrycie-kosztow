@@ -1,0 +1,19 @@
+{
+  "typ": "dokumenty",
+  "separator": ";",
+  "format_daty": "%d.%m.%Y",
+  "kolumny": {
+    "numer": "Nr dokumentu",
+    "data": "Data wystawienia",
+    "termin": "Termin płatności",
+    "kontrahent": "Sprzedawca",
+    "nip": "NIP sprzedawcy",
+    "rachunek": "Rachunek sprzedawcy",
+    "netto": "Netto",
+    "vat": "VAT",
+    "brutto": "Brutto",
+    "waluta": "Waluta",
+    "forma": "Sposób zapłaty",
+    "opis": "Uwagi"
+  }
+}

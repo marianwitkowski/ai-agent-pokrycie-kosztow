@@ -1,0 +1,15 @@
+{
+  "typ": "transakcje",
+  "separator": ";",
+  "format_daty": "%d.%m.%Y",
+  "kolumny": {
+    "data": ["Data operacji", "Data księgowania"],
+    "kwota": "Kwota",
+    "waluta": "Waluta",
+    "kontrahent": "Kontrahent",
+    "rachunek_kontrahenta": "Rachunek kontrahenta",
+    "tytul": "Tytuł",
+    "kategoria": "Typ operacji",
+    "rachunek": "Rachunek"
+  }
+}

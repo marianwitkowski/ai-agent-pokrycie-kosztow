@@ -1,0 +1,11 @@
+{
+  "dokumenty": "dokumenty.csv",
+  "transakcje": ["transakcje.csv"],
+  "korekty": "korekty.csv",
+  "wyniki": "wyniki",
+  "rachunki_wlasne": ["00 1111 0000 0000 0000 0000 0001"],
+  "pomin": ["podatkow", "rachun\\w* VAT", "urz[ąa]d skarbowy", "\\bZUS\\b"],
+  "bez_dopasowania": ["^opłata", "prowizja"],
+  "gotowka": ["bankomat", "wypłata gotówki"],
+  "reguly": {}
+}

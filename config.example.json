@@ -1,0 +1,18 @@
+{
+  "_opis": "Skopiuj jako config.json do katalogu roboczego (poza katalogiem narzędzi). Ścieżki są względne wobec tego pliku. Klucze zaczynające się od '_' są ignorowane.",
+  "dokumenty": "dokumenty.csv",
+  "transakcje": ["transakcje.csv"],
+  "korekty": "korekty.csv",
+  "wyniki": "wyniki",
+
+  "_rachunki_wlasne": "Rachunek(i) firmowe, z których płaci się za koszty. Puste = wszystkie rachunki z wyciągu. Nie wpisuj rachunku VAT.",
+  "rachunki_wlasne": ["00 0000 0000 0000 0000 0000 0000"],
+
+  "_reguly_tekstowe": "Wyrażenia regularne (bez rozróżniania wielkości liter) sprawdzane na 'kategoria | kontrahent | tytul'. Kolejność: pomin, bez_dopasowania, gotowka.",
+  "pomin": ["podatkow", "rachun\\w* VAT", "urz[ąa]d skarbowy", "\\bZUS\\b"],
+  "bez_dopasowania": ["^opłata", "prowizja"],
+  "gotowka": ["bankomat", "wypłata gotówki"],
+
+  "_reguly": "Opcjonalnie: dni_przed, dni_po, dni_po_karta, dni_pewne, tolerancja, tolerancja_walut, kurs_dzien_przed — domyślne w pokrycie.py (REGULY).",
+  "reguly": {}
+}

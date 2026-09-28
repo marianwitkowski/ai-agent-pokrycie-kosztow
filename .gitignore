@@ -1,0 +1,10 @@
+# Prawdziwe dane i wyniki nie trafiają do repozytorium — pracuj w katalogu roboczym poza tym katalogiem.
+/dane/
+/wyniki/
+/config.json
+/korekty.csv
+example/dokumenty.csv
+example/transakcje*.csv
+example/wyniki/
+__pycache__/
+.DS_Store

@@ -1,0 +1,16 @@
+{
+  "typ": "transakcje",
+  "opis": "Credit Agricole (CA24) — eksport historii rachunku do CSV (cp1250, ';', 101 kolumn). Nagłówki się powtarzają (np. 'Kwota', 'Adres', 'Okres'), więc kolumny są podane numerami. Data: 'Data operacji' (dzień płatności kartą), a gdy pusta — 'Data księgowania' (z godziną). Kontrahent: 'Odbiorca' albo 'Miejsce transakcji' (karta). Kwota ze znakiem i walutą: '-1 234,56 PLN'. Kolumna 0 to rachunek, z którego/na który jest operacja — rachunek VAT firmy wyklucz przez rachunki_wlasne w config.json. Sugerowane reguły w config.json: pomin ['^Przelew podatkowy', '^Przelew (na|z) rachun\\w* VAT'], bez_dopasowania ['^Opłata'], gotowka ['^Wypłata z bankomatu'].",
+  "kodowanie": "cp1250",
+  "separator": ";",
+  "format_daty": "%d.%m.%Y",
+  "kolumny": {
+    "data": [69, 70],
+    "kwota": 81,
+    "kontrahent": [10, 23],
+    "rachunek_kontrahenta": 15,
+    "tytul": 17,
+    "kategoria": 1,
+    "rachunek": 0
+  }
+}

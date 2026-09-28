@@ -1,0 +1,20 @@
+Nr dokumentu;Data wystawienia;Termin płatności;Sprzedawca;NIP sprzedawcy;Rachunek sprzedawcy;Netto;VAT;Brutto;Waluta;Sposób zapłaty;Uwagi
+FV/100/03/2026;02.03.2026;09.03.2026;Biuro Rachunkowe Przykład sp. z o.o.;1111111111;22 3333 4444 5555 6666 7777 8888;1000,00;230,00;1230,00;PLN;przelew;numer faktury w tytule przelewu
+LEAS/7/2026;03.03.2026;10.03.2026;Leasing Przykładowy S.A.;2222222222;11 2222 3333 4444 5555 6666 7777;2000,00;460,00;2460,00;PLN;przelew;tytuł bez numeru, zgodny rachunek sprzedawcy
+PAR/0001;05.03.2026;05.03.2026;Stacja Paliw Testowa sp. z o.o.;3333333333;;243,90;56,10;300,00;PLN;karta;paragon, płatność kartą tego samego dnia
+KAW/1;10.03.2026;;Kawiarnia Próbna;4444444444;;;;25,00;PLN;karta;dwie takie same kwoty — decyduje data
+KAW/2;12.03.2026;;Kawiarnia Próbna;4444444444;;;;25,00;PLN;karta;dwie takie same kwoty — decyduje data
+LOT/77/2026;15.03.2026;15.03.2026;Linie Lotnicze Przykład;5555555555;;;;600,00;PLN;karta;zapłacone trzema transakcjami
+BIL/1;16.03.2026;;Koleje Testowe;6666666666;;;;45,00;PLN;karta;dwa bilety — jedna płatność
+BIL/2;16.03.2026;;Koleje Testowe;6666666666;;;;45,00;PLN;karta;dwa bilety — jedna płatność
+INV-001;18.03.2026;;Example Cloud Inc.;;;50,00;0,00;50,00;USD;karta;faktura w USD, karta w PLN
+INV-002;25.03.2026;;Example Cloud Inc.;;;20,00;0,00;200,00;USD;karta;błąd odczytu kwoty — poprawiony w korekty.csv
+INV-003;28.03.2026;;Example Cloud Inc.;;;10,00;0,00;100,00;USD;karta;błąd odczytu kwoty — bez korekty
+PRYW/5;20.03.2026;20.03.2026;Sklep Przykładowy;7777777777;;;;150,00;PLN;karta;zapłacone prywatną kartą
+GOT/3;21.03.2026;21.03.2026;Warsztat Testowy;8888888888;;;;500,00;PLN;gotówka;gotówka z bankomatu
+PAR/0002;22.03.2026;22.03.2026;Stacja Paliw Testowa sp. z o.o.;3333333333;;;;99,99;PLN;karta;na wyciągu 100,00 — grosz różnicy bez numeru nie wystarcza
+PAR/0001;05.03.2026;05.03.2026;Stacja Paliw Testowa sp. z o.o.;3333333333;;243,90;56,10;300,00;PLN;karta;duplikat
+FV/9/2026;27.03.2026;20.02.2026;Hurtownia Próbna;9999999999;;;;120,00;PLN;przelew;termin ponad 30 dni przed datą wystawienia (literówka)
+FV/200/03/2026;30.03.2026;14.04.2026;Biuro Rachunkowe Przykład sp. z o.o.;1111111111;22 3333 4444 5555 6666 7777 8888;1000,00;230,00;1230,00;PLN;przelew;termin po końcu wyciągu
+POL/1;01.03.2026;;Ubezpieczenia Testowe S.A.;1212121212;;;;;PLN;przelew;brak kwoty
+HOT/12;28.03.2026;28.03.2026;Hotel Próbny;1313131313;;;;400,00;PLN;karta;faktura wystawiona po pobycie, zapłata 3 tygodnie wcześniej
