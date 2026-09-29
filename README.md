@@ -14,7 +14,7 @@ ile kosztów **nie ma pokrycia** w wydatkach z konta (z przeliczeniem walut po k
 
 W małej firmie część kosztów płaci się firmową kartą, część przelewem, a część — prywatną kartą, gotówką albo
 z innego rachunku. Program księgowy zwykle pokazuje, że dokument jest „zapłacony”, ale nie mówi **skąd**.
-Ręczne zestawianie kilkuset paragonów z wyciągiem zajmuje godziny i łatwo o pomyłkę.
+Ręczne zestawianie kilkudziesięciu paragonów/faktur z wyciągiem zajmuje czas i łatwo o pomyłkę.
 
 Agent robi to za Ciebie i daje:
 
